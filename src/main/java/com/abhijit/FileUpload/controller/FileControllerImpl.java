@@ -1,11 +1,11 @@
 package com.abhijit.FileUpload.controller;
 
 import com.abhijit.FileUpload.dto.AddFileDetailDTO;
-import com.abhijit.FileUpload.dto.FileDTO;
-import com.abhijit.FileUpload.exception.AccountFileGenException;
+import com.abhijit.FileUpload.dto.FileDataDTO;
+import com.abhijit.FileUpload.exception.FileDownloadException;
 import com.abhijit.FileUpload.service.FileUpload;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -27,28 +27,26 @@ import java.nio.file.StandardOpenOption;
 @RestController
 @Slf4j
 public class FileControllerImpl implements FileController {
+    @Autowired
     private FileUpload fileUpload;
 
     @Value("${file.upload-url}")
     private String fileDirectory;
 
-    public FileControllerImpl(FileUpload fileUpload) {
-        this.fileUpload = fileUpload;
+
+    @Override
+    public ResponseEntity<FileDataDTO> add(AddFileDetailDTO addFileDetailDTO) {
+        FileDataDTO fileDataDTO = fileUpload.add(addFileDetailDTO);
+        return new ResponseEntity<>(fileDataDTO, HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<FileDTO> add(AddFileDetailDTO addFileDetailDTO) {
-        FileDTO fileDTO = fileUpload.add(addFileDetailDTO);
-        return new ResponseEntity<>(fileDTO, HttpStatus.CREATED);
-    }
-
-    @Override
-    public ResponseEntity<Object> getAccFile() throws AccountFileGenException {
+    public ResponseEntity<Object> getAccFile() throws FileDownloadException {
         try {
             String file = fileUpload.createFile();
             String[] split = file.split("\\\\");
             String fileName = split[split.length - 1];
-            log.info("filenameee is" + fileName);
+            log.info("fileName is" + fileName);
 
             Path path = Paths.get(file);
             InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ);
@@ -64,9 +62,9 @@ public class FileControllerImpl implements FileController {
 
 
         } catch (IOException e) {
-            String msg = "Account file creation Failed";
+            String msg = "file download Failed";
             log.error(msg);
-            throw new AccountFileGenException(msg);
+            throw new FileDownloadException(msg);
         }
     }
 
@@ -88,8 +86,8 @@ public class FileControllerImpl implements FileController {
             e.printStackTrace();
             System.out.println("failed to write a file");
         }
-        fileUpload.SaveinDB(path);
-        return new ResponseEntity<>(HttpStatus.OK);
+        fileUpload.SaveInDB(path);
+        return new ResponseEntity<>("File Uploaded successfully",HttpStatus.OK);
 
     }
 }

@@ -1,60 +1,61 @@
 package com.abhijit.FileUpload.service;
 
 import com.abhijit.FileUpload.dto.AddFileDetailDTO;
-import com.abhijit.FileUpload.dto.FileDTO;
-import com.abhijit.FileUpload.entity.File;
+import com.abhijit.FileUpload.dto.FileDataDTO;
 import com.abhijit.FileUpload.entity.FileData;
+import com.abhijit.FileUpload.entity.UploadedFiles;
 import com.abhijit.FileUpload.mapper.FileMapper;
 import com.abhijit.FileUpload.repo.FileDataRepo;
-import com.abhijit.FileUpload.repo.FileRepo;
+import com.abhijit.FileUpload.repo.UploadedFileRepo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
 public class FileUploadImpl implements FileUpload {
+    @Autowired
+    private UploadedFileRepo uploadedFileRepo;
 
-    private FileRepo fileRepo;
+    @Autowired
     private FileMapper fileMapper;
 
-
+    @Autowired
     private FileNumberService fileNumberService;
-
+    @Autowired
     private FileDataRepo fileDataRepo;
 
-    @Value("$file-report-url")
-    private String file_report_url;
+    @Value("${file-report-url}")
+    private String file_download_url;
 
-
-
-    public FileUploadImpl(FileRepo fileRepo, FileMapper fileMapper, FileNumberService fileNumberService, FileDataRepo fileDataRepo) {
-        this.fileRepo = fileRepo;
-        this.fileMapper = fileMapper;
-        this.fileNumberService = fileNumberService;
-        this.fileDataRepo = fileDataRepo;
-    }
 
     @Override
-    public String createFile() {
-        List<File> fileList = fileRepo.findAll();
+    public String createFile() throws IOException {
+        List<FileData> fileList = fileDataRepo.findAll();
 
-        String filename = fileNumberService.getNewFileNumber();
-        String filePath = "C:\\\\Users\\\\mishr\\\\OneDrive\\\\Desktop\\\\FileUpload\\\\" + filename;
-        log.info(filePath);
+        String filename = UUID.randomUUID().toString().replace("-", "");
+        String filePath = file_download_url + filename;
         Path path = Paths.get(filePath);
+        if (Files.exists(path)) {
+            Files.delete(path);
+        }
         try {
             BufferedWriter bufferedWriter = Files.newBufferedWriter(path, StandardOpenOption.CREATE_NEW);
-            for (File file : fileList) {
-                bufferedWriter.write(file.print().toString());
+            for (FileData fileData : fileList) {
+                FileDataDTO fileDataDTO = fileMapper.convertFileDataToFileDataDTO(fileData);
+                bufferedWriter.write(fileDataDTO.print());
                 bufferedWriter.write(System.lineSeparator());
                 bufferedWriter.flush();
             }
@@ -65,27 +66,26 @@ public class FileUploadImpl implements FileUpload {
     }
 
     @Override
-    public FileDTO add(AddFileDetailDTO addFileDetailDTO) {
-//        fileRepo.deleteAll();
-        File file = fileMapper.convertaddFileDetailDTOToFile(addFileDetailDTO);
-        file.setFileNumber(fileNumberService.getNewFileNumber());
-        File file1 = fileRepo.save(file);
-        FileDTO fileDTO = fileMapper.convertfileToFileDTO(file1);
-        return fileDTO;
+    public FileDataDTO add(AddFileDetailDTO addFileDetailDTO) {
+        FileData fileData = fileMapper.convertAddFileDetailDTOToFileData(addFileDetailDTO);
+        fileData.setFileNumber(fileNumberService.getNewFileNumber());
+        FileData fileData1 = fileDataRepo.save(fileData);
+        return fileMapper.convertFileDataToFileDataDTO(fileData1);
+
     }
 
     @Override
-    public void SaveinDB(Path path) {
-        try (BufferedReader bufferedReader = Files.newBufferedReader(path)) {
+    public void SaveInDB(Path path) {
+        try (BufferedReader bufferedReader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] split = line.split(",");
-                String fileNumber=split[0];
-                String version=split[1];
-                String alphabet=split[2];
-                int count= Integer.parseInt(split[3]);
-                FileData fileData=new FileData(fileNumber,version,alphabet,count);
-                fileDataRepo.save(fileData);
+                String fileNumber = split[0];
+                String alphabet = split[1];
+                int count = Integer.parseInt(split[2]);
+                UploadedFiles uploadedFiles=new UploadedFiles(fileNumber,alphabet,count);
+                uploadedFileRepo.save(uploadedFiles);
+
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
