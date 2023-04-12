@@ -87,7 +87,7 @@ public class DataControllerImpl implements DataController {
             System.out.println("failed to write a file");
         }
         dataService.SaveInDB(path);
-        return new ResponseEntity<>("File Uploaded successfully",HttpStatus.OK);
+        return new ResponseEntity<>("File Uploaded successfully", HttpStatus.OK);
 
     }
 }

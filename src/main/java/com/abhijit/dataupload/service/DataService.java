@@ -8,9 +8,6 @@ import java.nio.file.Path;
 
 public interface DataService {
     String createFile() throws IOException;
-
     FileDataDTO add(DataDTO dataDTO);
-
-
     void SaveInDB(Path path);
 }

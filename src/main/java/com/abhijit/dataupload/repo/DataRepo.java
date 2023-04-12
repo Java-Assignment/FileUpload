@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FileDataRepo extends MongoRepository<Data, String> {
+public interface DataRepo extends MongoRepository<Data, String> {
 
 }

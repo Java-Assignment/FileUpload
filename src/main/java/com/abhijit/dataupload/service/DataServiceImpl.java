@@ -5,7 +5,7 @@ import com.abhijit.dataupload.dto.FileDataDTO;
 import com.abhijit.dataupload.entity.Data;
 import com.abhijit.dataupload.entity.UploadedFile;
 import com.abhijit.dataupload.mapper.DataMapper;
-import com.abhijit.dataupload.repo.FileDataRepo;
+import com.abhijit.dataupload.repo.DataRepo;
 import com.abhijit.dataupload.repo.UploadedFileRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class DataServiceImpl implements DataService {
     @Autowired
     private FileNumberService fileNumberService;
     @Autowired
-    private FileDataRepo fileDataRepo;
+    private DataRepo dataRepo;
 
     @Value("${file-report-url}")
     private String file_download_url;
@@ -43,7 +43,7 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public String createFile() throws IOException {
-        List<Data> fileList = fileDataRepo.findAll();
+        List<Data> fileList = dataRepo.findAll();
 
         String filename = UUID.randomUUID().toString().replace("-", "");
         String filePath = file_download_url + filename;
@@ -54,7 +54,7 @@ public class DataServiceImpl implements DataService {
         try {
             BufferedWriter bufferedWriter = Files.newBufferedWriter(path, StandardOpenOption.CREATE_NEW);
             for (Data data : fileList) {
-                FileDataDTO fileDataDTO = dataMapper.convertFileDataToFileDataDTO(data);
+                FileDataDTO fileDataDTO = dataMapper.convertDataToFileDataDTO(data);
                 bufferedWriter.write(fileDataDTO.print());
                 bufferedWriter.write(System.lineSeparator());
                 bufferedWriter.flush();
@@ -67,10 +67,10 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public FileDataDTO add(DataDTO dataDTO) {
-        Data data = dataMapper.convertDataDTOToFileData(dataDTO);
+        Data data = dataMapper.convertDataDTOToFileDataDTO(dataDTO);
         data.setFileNumber(fileNumberService.getNewFileNumber());
-        Data data1 = fileDataRepo.save(data);
-        return dataMapper.convertFileDataToFileDataDTO(data1);
+        Data data1 = dataRepo.save(data);
+        return dataMapper.convertDataToFileDataDTO(data1);
 
     }
 
@@ -81,9 +81,13 @@ public class DataServiceImpl implements DataService {
             while ((line = bufferedReader.readLine()) != null) {
                 String[] split = line.split(",");
                 String fileNumber = split[0];
-                String variable = split[1];
-                int value = Integer.parseInt(split[2 ]);
-                UploadedFile uploadedFile =new UploadedFile(fileNumber,variable,value);
+                String variable1 = split[1];
+                int value1 = Integer.parseInt(split[2]);
+                String variable2 = split[3];
+                int value2 = Integer.parseInt(split[4]);
+                String variable3 = split[5];
+                int value3 = Integer.parseInt(split[6]);
+                UploadedFile uploadedFile = new UploadedFile(fileNumber, variable1, value1, variable2, value2, variable3, value3);
                 uploadedFileRepo.save(uploadedFile);
 
             }
