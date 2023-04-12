@@ -1,8 +1,8 @@
-package com.abhijit.FileUpload.controller;
+package com.abhijit.dataupload.controller;
 
-import com.abhijit.FileUpload.dto.AddFileDetailDTO;
-import com.abhijit.FileUpload.dto.FileDataDTO;
-import com.abhijit.FileUpload.exception.FileDownloadException;
+import com.abhijit.dataupload.dto.DataDTO;
+import com.abhijit.dataupload.dto.FileDataDTO;
+import com.abhijit.dataupload.exception.FileDownloadException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
@@ -16,10 +16,10 @@ import java.io.IOException;
 @RequestMapping(value = "/file", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 @Validated
 @Tag(name = "File management Api", description = "API for all fileRelated operation")
-public interface FileController {
+public interface DataController {
     @PostMapping
-    @Operation(summary = "create new file")
-    ResponseEntity<FileDataDTO> add(@RequestBody @Validated AddFileDetailDTO addFileDetailDTO);
+    @Operation(summary = "enter data values")
+    ResponseEntity<FileDataDTO> add(@RequestBody @Validated DataDTO dataDTO);
 
     @GetMapping("/file")
     @Operation(summary = "Download all file data")

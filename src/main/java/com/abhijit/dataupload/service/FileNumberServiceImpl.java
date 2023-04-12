@@ -1,7 +1,7 @@
-package com.abhijit.FileUpload.service;
+package com.abhijit.dataupload.service;
 
-import com.abhijit.FileUpload.entity.FileNumber;
-import com.abhijit.FileUpload.repo.FileNumberRepo;
+import com.abhijit.dataupload.entity.FileNumber;
+import com.abhijit.dataupload.repo.FileNumberRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;

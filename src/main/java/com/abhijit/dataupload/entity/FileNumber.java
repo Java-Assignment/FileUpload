@@ -1,4 +1,4 @@
-package com.abhijit.FileUpload.entity;
+package com.abhijit.dataupload.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

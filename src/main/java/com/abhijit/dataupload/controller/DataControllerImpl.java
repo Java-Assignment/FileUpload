@@ -1,9 +1,9 @@
-package com.abhijit.FileUpload.controller;
+package com.abhijit.dataupload.controller;
 
-import com.abhijit.FileUpload.dto.AddFileDetailDTO;
-import com.abhijit.FileUpload.dto.FileDataDTO;
-import com.abhijit.FileUpload.exception.FileDownloadException;
-import com.abhijit.FileUpload.service.FileUpload;
+import com.abhijit.dataupload.dto.DataDTO;
+import com.abhijit.dataupload.dto.FileDataDTO;
+import com.abhijit.dataupload.exception.FileDownloadException;
+import com.abhijit.dataupload.service.DataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,24 +26,24 @@ import java.nio.file.StandardOpenOption;
 
 @RestController
 @Slf4j
-public class FileControllerImpl implements FileController {
+public class DataControllerImpl implements DataController {
     @Autowired
-    private FileUpload fileUpload;
+    private DataService dataService;
 
     @Value("${file.upload-url}")
     private String fileDirectory;
 
 
     @Override
-    public ResponseEntity<FileDataDTO> add(AddFileDetailDTO addFileDetailDTO) {
-        FileDataDTO fileDataDTO = fileUpload.add(addFileDetailDTO);
+    public ResponseEntity<FileDataDTO> add(DataDTO dataDTO) {
+        FileDataDTO fileDataDTO = dataService.add(dataDTO);
         return new ResponseEntity<>(fileDataDTO, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Object> getAccFile() throws FileDownloadException {
         try {
-            String file = fileUpload.createFile();
+            String file = dataService.createFile();
             String[] split = file.split("\\\\");
             String fileName = split[split.length - 1];
             log.info("fileName is" + fileName);
@@ -86,7 +86,7 @@ public class FileControllerImpl implements FileController {
             e.printStackTrace();
             System.out.println("failed to write a file");
         }
-        fileUpload.SaveInDB(path);
+        dataService.SaveInDB(path);
         return new ResponseEntity<>("File Uploaded successfully",HttpStatus.OK);
 
     }

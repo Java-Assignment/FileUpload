@@ -1,12 +1,12 @@
-package com.abhijit.FileUpload.service;
+package com.abhijit.dataupload.service;
 
-import com.abhijit.FileUpload.dto.AddFileDetailDTO;
-import com.abhijit.FileUpload.dto.FileDataDTO;
-import com.abhijit.FileUpload.entity.FileData;
-import com.abhijit.FileUpload.entity.UploadedFiles;
-import com.abhijit.FileUpload.mapper.FileMapper;
-import com.abhijit.FileUpload.repo.FileDataRepo;
-import com.abhijit.FileUpload.repo.UploadedFileRepo;
+import com.abhijit.dataupload.dto.DataDTO;
+import com.abhijit.dataupload.dto.FileDataDTO;
+import com.abhijit.dataupload.entity.Data;
+import com.abhijit.dataupload.entity.UploadedFile;
+import com.abhijit.dataupload.mapper.DataMapper;
+import com.abhijit.dataupload.repo.FileDataRepo;
+import com.abhijit.dataupload.repo.UploadedFileRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,12 +25,12 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-public class FileUploadImpl implements FileUpload {
+public class DataServiceImpl implements DataService {
     @Autowired
     private UploadedFileRepo uploadedFileRepo;
 
     @Autowired
-    private FileMapper fileMapper;
+    private DataMapper dataMapper;
 
     @Autowired
     private FileNumberService fileNumberService;
@@ -43,7 +43,7 @@ public class FileUploadImpl implements FileUpload {
 
     @Override
     public String createFile() throws IOException {
-        List<FileData> fileList = fileDataRepo.findAll();
+        List<Data> fileList = fileDataRepo.findAll();
 
         String filename = UUID.randomUUID().toString().replace("-", "");
         String filePath = file_download_url + filename;
@@ -53,8 +53,8 @@ public class FileUploadImpl implements FileUpload {
         }
         try {
             BufferedWriter bufferedWriter = Files.newBufferedWriter(path, StandardOpenOption.CREATE_NEW);
-            for (FileData fileData : fileList) {
-                FileDataDTO fileDataDTO = fileMapper.convertFileDataToFileDataDTO(fileData);
+            for (Data data : fileList) {
+                FileDataDTO fileDataDTO = dataMapper.convertFileDataToFileDataDTO(data);
                 bufferedWriter.write(fileDataDTO.print());
                 bufferedWriter.write(System.lineSeparator());
                 bufferedWriter.flush();
@@ -66,11 +66,11 @@ public class FileUploadImpl implements FileUpload {
     }
 
     @Override
-    public FileDataDTO add(AddFileDetailDTO addFileDetailDTO) {
-        FileData fileData = fileMapper.convertAddFileDetailDTOToFileData(addFileDetailDTO);
-        fileData.setFileNumber(fileNumberService.getNewFileNumber());
-        FileData fileData1 = fileDataRepo.save(fileData);
-        return fileMapper.convertFileDataToFileDataDTO(fileData1);
+    public FileDataDTO add(DataDTO dataDTO) {
+        Data data = dataMapper.convertDataDTOToFileData(dataDTO);
+        data.setFileNumber(fileNumberService.getNewFileNumber());
+        Data data1 = fileDataRepo.save(data);
+        return dataMapper.convertFileDataToFileDataDTO(data1);
 
     }
 
@@ -81,10 +81,10 @@ public class FileUploadImpl implements FileUpload {
             while ((line = bufferedReader.readLine()) != null) {
                 String[] split = line.split(",");
                 String fileNumber = split[0];
-                String alphabet = split[1];
-                int count = Integer.parseInt(split[2]);
-                UploadedFiles uploadedFiles=new UploadedFiles(fileNumber,alphabet,count);
-                uploadedFileRepo.save(uploadedFiles);
+                String variable = split[1];
+                int value = Integer.parseInt(split[2 ]);
+                UploadedFile uploadedFile =new UploadedFile(fileNumber,variable,value);
+                uploadedFileRepo.save(uploadedFile);
 
             }
         } catch (IOException e) {

@@ -1,19 +1,18 @@
-package com.abhijit.FileUpload.entity;
+package com.abhijit.dataupload.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "FileData")
-@Data
+@lombok.Data
 @AllArgsConstructor
-public class FileData {
+public class Data {
     @Id
     private String fileNumber;
     private String version;
 
-    private String alphabet;
+    private String Variable;
 
-    private int count;
+    private int Value;
 }

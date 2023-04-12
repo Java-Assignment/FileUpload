@@ -1,4 +1,4 @@
-package com.abhijit.FileUpload;
+package com.abhijit.dataupload;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,10 +6,10 @@ import org.springframework.retry.annotation.EnableRetry;
 
 @SpringBootApplication
 @EnableRetry
-public class FileUploadApplication {
+public class dataUploadApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FileUploadApplication.class, args);
+		SpringApplication.run(dataUploadApplication.class, args);
 	}
 
 }

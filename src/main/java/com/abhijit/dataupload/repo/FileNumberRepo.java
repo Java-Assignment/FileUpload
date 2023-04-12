@@ -1,6 +1,6 @@
-package com.abhijit.FileUpload.repo;
+package com.abhijit.dataupload.repo;
 
-import com.abhijit.FileUpload.entity.FileNumber;
+import com.abhijit.dataupload.entity.FileNumber;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,17 +1,17 @@
-package com.abhijit.FileUpload.entity;
+package com.abhijit.dataupload.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import nonapi.io.github.classgraph.json.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "UploadedFiles")
+@Document(collection = "UploadedFile")
 @Data
 @AllArgsConstructor
-public class UploadedFiles {
+public class UploadedFile {
     @Id
     private String fileNumber;
-    private String alphabet;
+    private String Variable;
 
-    private int count;
+    private int Value;
 }
